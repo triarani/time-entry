@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\Project;
 use App\Models\Task;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -15,33 +16,56 @@ use Illuminate\Routing\Controller;
  */
 class OptionsController extends Controller
 {
+    /**
+     * Return employee options, cached for performance.
+     * Cache key includes the optional company_id filter.
+     */
     public function employees(Request $request)
     {
         $companyId = $request->query('company_id');
-        $query = Employee::query();
-        if ($companyId) {
-            $query->where('company_id', $companyId);
-        }
-        return response()->json($query->get());
+        $cacheKey = $companyId ? "options:employees:company:$companyId" : 'options:employees:all';
+        // Cache for 60 minutes (adjust as needed)
+        $employees = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($companyId) {
+            $query = Employee::query();
+            if ($companyId) {
+                $query->where('company_id', $companyId);
+            }
+            return $query->get();
+        });
+        return response()->json($employees);
     }
 
+    /**
+     * Return project options, cached for performance.
+     */
     public function projects(Request $request)
     {
         $companyId = $request->query('company_id');
-        $query = Project::query();
-        if ($companyId) {
-            $query->where('company_id', $companyId);
-        }
-        return response()->json($query->get());
+        $cacheKey = $companyId ? "options:projects:company:$companyId" : 'options:projects:all';
+        $projects = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($companyId) {
+            $query = Project::query();
+            if ($companyId) {
+                $query->where('company_id', $companyId);
+            }
+            return $query->get();
+        });
+        return response()->json($projects);
     }
 
+    /**
+     * Return task options, cached for performance.
+     */
     public function tasks(Request $request)
     {
         $companyId = $request->query('company_id');
-        $query = Task::query();
-        if ($companyId) {
-            $query->where('company_id', $companyId);
-        }
-        return response()->json($query->get());
+        $cacheKey = $companyId ? "options:tasks:company:$companyId" : 'options:tasks:all';
+        $tasks = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($companyId) {
+            $query = Task::query();
+            if ($companyId) {
+                $query->where('company_id', $companyId);
+            }
+            return $query->get();
+        });
+        return response()->json($tasks);
     }
 }

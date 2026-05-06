@@ -73,7 +73,39 @@ const employees = ref<Array<any>>([]);
 const projects = ref<Array<any>>([]);
 const tasks = ref<Array<any>>([]);
 
+/**
+ * Simple client‑side cache for dropdown options.
+ * Stores data in localStorage with a timestamp. TTL is 60 minutes.
+ */
+function getCached(key: string) {
+  const raw = localStorage.getItem(key);
+  if (!raw) return null;
+  try {
+    const { data, ts } = JSON.parse(raw);
+    // 60 minutes TTL
+    if (Date.now() - ts < 60 * 60 * 1000) return data;
+  } catch (_) {}
+  return null;
+}
+
+function setCached(key: string, data: any) {
+  const payload = { data, ts: Date.now() };
+  localStorage.setItem(key, JSON.stringify(payload));
+}
+
 async function fetchOptions() {
+  // Try to load from cache first
+  const cachedEmployees = getCached('options:employees');
+  const cachedProjects = getCached('options:projects');
+  const cachedTasks = getCached('options:tasks');
+
+  if (cachedEmployees && cachedProjects && cachedTasks) {
+    employees.value = cachedEmployees;
+    projects.value = cachedProjects;
+    tasks.value = cachedTasks;
+    return;
+  }
+
   const [eRes, pRes, tRes] = await Promise.all([
     axios.get('/api/options/employees'),
     axios.get('/api/options/projects'),
@@ -82,6 +114,11 @@ async function fetchOptions() {
   employees.value = eRes.data;
   projects.value = pRes.data;
   tasks.value = tRes.data;
+
+  // Store in cache for future loads
+  setCached('options:employees', employees.value);
+  setCached('options:projects', projects.value);
+  setCached('options:tasks', tasks.value);
 }
 
 onMounted(fetchOptions);

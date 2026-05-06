@@ -29,7 +29,10 @@ class TimeEntryController extends Controller
             $query->where('date', $request->input('date'));
         }
 
-        return response()->json($query->orderByDesc('date')->get());
+        // Use cursor based pagination for efficient large result sets
+        // Default page size of 50 entries; client can pass `per_page` query param
+        $perPage = $request->query('per_page', 50);
+        return response()->json($query->orderByDesc('date')->cursorPaginate($perPage));
     }
 
     /**
