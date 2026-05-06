@@ -15,6 +15,9 @@ Route::get('/employees', [EmployeeController::class, 'index']);
 Route::get('/projects', [ProjectController::class, 'index']);
 Route::get('/tasks', [TaskController::class, 'index']);
 Route::get('/time-entries', [TimeEntryController::class, 'index']);
+// Added POST route for creating a single time entry (plural endpoint)
+Route::post('/time-entries', [TimeEntryController::class, 'store']);
+// Retain original singular endpoint for backward compatibility (optional)
 Route::post('/time-entry', [TimeEntryController::class, 'store']);
 // Batch endpoint for creating multiple time entries with validation per entry.
 Route::post('/time-entries/batch', [TimeEntryController::class, 'storeBatch']);
