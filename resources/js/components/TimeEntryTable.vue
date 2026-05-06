@@ -13,34 +13,34 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(row, i) in rows" :key="i" class="border-t">
+        <tr v-for="(row, i) in rows" :key="i" class="border-t" :class="{'bg-red-50': rowHasError(i)}">
           <td class="p-2 border">
-            <input type="date" v-model="row.date" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'date')" :aria-describedby="fieldError(i, 'date') ? `error-${i}-date` : undefined" :class="{'border-red-500': fieldError(i, 'date')}" />
+            <input type="date" v-model="row.date" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" @input="clearError(i, 'date')" :aria-invalid="!!fieldError(i, 'date')" :aria-describedby="fieldError(i, 'date') ? `error-${i}-date` : undefined" :class="{'border-red-500': fieldError(i, 'date')}" />
             <p v-if="fieldError(i, 'date')" :id="`error-${i}-date`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'date')?.[0] }}</p>
           </td>
           <td class="p-2 border">
-              <select v-model.number="row.employee_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'employee_id')" :aria-describedby="fieldError(i, 'employee_id') ? `error-${i}-employee` : undefined" :class="{'border-red-500': fieldError(i, 'employee_id')}">
+              <select v-model.number="row.employee_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" @change="clearError(i, 'employee_id')" :aria-invalid="!!fieldError(i, 'employee_id')" :aria-describedby="fieldError(i, 'employee_id') ? `error-${i}-employee` : undefined" :class="{'border-red-500': fieldError(i, 'employee_id')}">
               <option value="" disabled>Select employee</option>
               <option v-for="e in employees" :key="e.id" :value="e.id">{{ e.first_name }} {{ e.last_name }}</option>
             </select>
             <p v-if="fieldError(i, 'employee_id')" :id="`error-${i}-employee`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'employee_id')?.[0] }}</p>
           </td>
           <td class="p-2 border">
-              <select v-model.number="row.project_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'project_id')" :aria-describedby="fieldError(i, 'project_id') ? `error-${i}-project` : undefined" :class="{'border-red-500': fieldError(i, 'project_id')}">
+              <select v-model.number="row.project_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" @change="clearError(i, 'project_id')" :aria-invalid="!!fieldError(i, 'project_id')" :aria-describedby="fieldError(i, 'project_id') ? `error-${i}-project` : undefined" :class="{'border-red-500': fieldError(i, 'project_id')}">
               <option value="" disabled>Select project</option>
               <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
             </select>
             <p v-if="fieldError(i, 'project_id')" :id="`error-${i}-project`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'project_id')?.[0] }}</p>
           </td>
           <td class="p-2 border">
-              <select v-model.number="row.task_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'task_id')" :aria-describedby="fieldError(i, 'task_id') ? `error-${i}-task` : undefined" :class="{'border-red-500': fieldError(i, 'task_id')}">
+              <select v-model.number="row.task_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" @change="clearError(i, 'task_id')" :aria-invalid="!!fieldError(i, 'task_id')" :aria-describedby="fieldError(i, 'task_id') ? `error-${i}-task` : undefined" :class="{'border-red-500': fieldError(i, 'task_id')}">
               <option value="" disabled>Select task</option>
               <option v-for="t in tasks" :key="t.id" :value="t.id">{{ t.name }}</option>
             </select>
             <p v-if="fieldError(i, 'task_id')" :id="`error-${i}-task`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'task_id')?.[0] }}</p>
           </td>
           <td class="p-2 border">
-            <input type="number" step="0.25" min="0" v-model="row.hours" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'hours')" :aria-describedby="fieldError(i, 'hours') ? `error-${i}-hours` : undefined" :class="{'border-red-500': fieldError(i, 'hours')}" />
+            <input type="number" step="0.25" min="0" v-model="row.hours" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" @input="clearError(i, 'hours')" :aria-invalid="!!fieldError(i, 'hours')" :aria-describedby="fieldError(i, 'hours') ? `error-${i}-hours` : undefined" :class="{'border-red-500': fieldError(i, 'hours')}" />
             <p v-if="fieldError(i, 'hours')" :id="`error-${i}-hours`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'hours')?.[0] }}</p>
           </td>
           <td class="p-2 border">
@@ -147,6 +147,29 @@ const errors = ref<Record<string, string[]>>({}); // keyed by "entries.{row}.{fi
 function fieldError(rowIndex: number, field: string): string[] | null {
   const key = `entries.${rowIndex}.${field}`;
   return errors.value[key] ?? null;
+}
+
+/**
+ * Remove a specific field error for a given row.
+ * This is used by the input/@input handlers to clear the error as the user edits the field.
+ */
+function clearError(rowIndex: number, field: string): void {
+  const key = `entries.${rowIndex}.${field}`;
+  if (key in errors.value) {
+    // Delete the key and trigger reactivity by assigning a new object copy
+    const { [key]: _, ...rest } = errors.value;
+    errors.value = rest as Record<string, string[]>;
+  }
+}
+
+/**
+ * Determine whether a given row has any validation errors.
+ * The server returns an `errors` object keyed by "entries.{row}.{field}".
+ * If any key for the supplied row index exists, we consider the row to be in error state.
+ */
+function rowHasError(rowIndex: number): boolean {
+  const prefix = `entries.${rowIndex}.`;
+  return Object.keys(errors.value).some((k) => k.startsWith(prefix));
 }
 
 function addRow() {
