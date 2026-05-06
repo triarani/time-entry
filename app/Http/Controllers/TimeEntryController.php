@@ -43,29 +43,23 @@ class TimeEntryController extends Controller
      */
     public function store(Request $request)
     {
-        // Basic field validation
-        $validator = \Validator::make($request->all(), [
+        // Basic field validation with custom rule
+        $validated = \Validator::make($request->all(), [
             'employee_id' => 'required|exists:employees,id',
-            'project_id'  => 'required|exists:projects,id',
+            'project_id'  => [
+                'required',
+                'exists:projects,id',
+                new \App\Rules\ProjectPerDateRule(
+                    $request->input('employee_id'),
+                    $request->input('date') ?? now()->toDateString()
+                ),
+            ],
             // Tasks are company‑wide, not project‑specific.
             'task_id'     => 'required|exists:tasks,id',
             'date'        => 'nullable|date',
             'hours'       => 'required|numeric|min:0',
             'notes'       => 'nullable|string',
-        ]);
-
-        // Custom rule: an employee may have only one project per date.
-        $validator->after(function ($validator) use ($request) {
-            $date = $request->input('date') ?? now()->toDateString();
-            $existing = \App\Models\TimeEntry::where('employee_id', $request->input('employee_id'))
-                ->where('date', $date)
-                ->first();
-            if ($existing && $existing->project_id != $request->input('project_id')) {
-                $validator->errors()->add('project_id', 'An employee can only have one project per date.');
-            }
-        });
-
-        $validated = $validator->validate();
+        ])->validate();
 
         // If date is not supplied, set it to the current date.
         if (empty($validated['date'])) {
@@ -100,32 +94,19 @@ class TimeEntryController extends Controller
         foreach ($entries as $index => $entry) {
             $validator = \Validator::make($entry, [
                 'employee_id' => 'required|exists:employees,id',
-                'project_id'  => 'required|exists:projects,id',
+                'project_id'  => [
+                    'required',
+                    'exists:projects,id',
+                    new \App\Rules\ProjectPerDateRule(
+                        $entry['employee_id'],
+                        $entry['date'] ?? now()->toDateString()
+                    ),
+                ],
                 'task_id'     => 'required|exists:tasks,id',
                 'date'        => 'nullable|date',
                 'hours'       => 'required|numeric|min:0',
                 'notes'       => 'nullable|string',
             ]);
-
-            $validator->after(function ($validator) use ($entry, $entries, $index) {
-                $date = $entry['date'] ?? now()->toDateString();
-                // Check against existing DB records
-                $existing = \App\Models\TimeEntry::where('employee_id', $entry['employee_id'])
-                    ->where('date', $date)
-                    ->first();
-                if ($existing && $existing->project_id != $entry['project_id']) {
-                    $validator->errors()->add('project_id', 'An employee can only have one project per date.');
-                }
-                // Check within the batch for duplicate employee/date with different project
-                foreach ($entries as $j => $other) {
-                    if ($j === $index) continue;
-                    $otherDate = $other['date'] ?? now()->toDateString();
-                    if ($other['employee_id'] == $entry['employee_id'] && $otherDate == $date && $other['project_id'] != $entry['project_id']) {
-                        $validator->errors()->add('project_id', 'Batch contains conflicting project for same employee/date.');
-                        break;
-                    }
-                }
-            });
 
             if ($validator->fails()) {
                 $batchErrors[$index] = $validator->errors()->messages();
