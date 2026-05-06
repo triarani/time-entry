@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('time_entries', function (Blueprint $table) {
             $table->id();
-             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('employee_id')->constrained()->cascadeOnDelete();
             $table->foreignId('project_id')->constrained()->cascadeOnDelete();
             $table->foreignId('task_id')->constrained()->cascadeOnDelete();
-            $table->date('work_date');
+            $table->date('date');
             $table->decimal('hours', 8, 2);
             $table->text('notes')->nullable();
             $table->timestamps();
 
             // Speeds up filtering by company + validates 1-project-per-day rule efficiently
-            $table->index(['company_id', 'employee_id', 'work_date']);
+            $table->index(['company_id', 'employee_id', 'date']);
         });
     }
 

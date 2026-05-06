@@ -14,6 +14,6 @@ Route::get('/employees', [EmployeeController::class, 'index']);
 Route::get('/projects', [ProjectController::class, 'index']);
 Route::get('/tasks', [TaskController::class, 'index']);
 Route::get('/time-entries', [TimeEntryController::class, 'index']);
-Route::post('/time-entry', [TimeEntryController::class, 'store']);
+Route::post('/time-entries', [TimeEntryController::class, 'store']);
 // Test route
 Route::get('/test', function () { return response()->json(['ok' => true]); });

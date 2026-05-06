@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Employee extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'employees';
     protected $fillable = [
         'first_name',
@@ -18,12 +18,14 @@ class Employee extends Model
 
     public function companies()
     {
-        return $this->belongsToMany(Company::class)->withTimestamps();
+        return $this->belongsToMany(Company::class, 'employee_company');
     }
 
     public function projects()
     {
-        return $this->belongsToMany(Project::class)->withTimestamps();
+        return $this->belongsToMany(Project::class, 'employee_project')
+            ->withPivot('date')
+            ->withTimestamps();
     }
 
     public function timeEntries()

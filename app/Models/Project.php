@@ -9,7 +9,6 @@ class Project extends Model
 {
     use HasFactory;
 
-    protected $table = 'projects';
     protected $fillable = ['company_id', 'name', 'description'];
 
     public function company()
@@ -19,7 +18,9 @@ class Project extends Model
 
     public function employees()
     {
-        return $this->belongsToMany(Employee::class)->withTimestamps();
+        return $this->belongsToMany(Employee::class, 'employee_project')
+            ->withPivot('date')
+            ->withTimestamps();
     }
 
     public function timeEntries()
