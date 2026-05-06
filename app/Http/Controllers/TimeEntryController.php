@@ -120,7 +120,20 @@ class TimeEntryController extends Controller
         }
 
         if (!empty($batchErrors)) {
-            return response()->json(['errors' => $batchErrors], 422);
+            // Transform errors to a flat array that includes the row index, field, and message.
+            $formatted = [];
+            foreach ($batchErrors as $row => $fields) {
+                foreach ($fields as $field => $messages) {
+                    foreach ($messages as $msg) {
+                        $formatted[] = [
+                            'row' => $row,
+                            'field' => $field,
+                            'message' => $msg,
+                        ];
+                    }
+                }
+            }
+            return response()->json(['errors' => $formatted], 422);
         }
 
         $created = \App\Models\TimeEntry::insert($validatedEntries);

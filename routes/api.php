@@ -15,5 +15,11 @@ Route::get('/projects', [ProjectController::class, 'index']);
 Route::get('/tasks', [TaskController::class, 'index']);
 Route::get('/time-entries', [TimeEntryController::class, 'index']);
 Route::post('/time-entries', [TimeEntryController::class, 'store']);
+// Batch endpoint for creating multiple time entries with validation per entry.
+Route::post('/time-entries/batch', [TimeEntryController::class, 'storeBatch']);
+// Dependent dropdown endpoints (company -> employees, projects, tasks)
+Route::get('/companies/{company}/employees', [CompanyController::class, 'employees']);
+Route::get('/companies/{company}/projects', [CompanyController::class, 'projects']);
+Route::get('/companies/{company}/tasks', [CompanyController::class, 'tasks']);
 // Test route
 Route::get('/test', function () { return response()->json(['ok' => true]); });
