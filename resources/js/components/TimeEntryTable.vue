@@ -15,33 +15,33 @@
       <tbody>
         <tr v-for="(row, i) in rows" :key="i" class="border-t">
           <td class="p-2 border">
-            <input type="date" v-model="row.date" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'date')" />
-            <p v-if="fieldError(i, 'date')" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'date')?.[0] }}</p>
+            <input type="date" v-model="row.date" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'date')" :aria-describedby="fieldError(i, 'date') ? `error-${i}-date` : undefined" :class="{'border-red-500': fieldError(i, 'date')}" />
+            <p v-if="fieldError(i, 'date')" :id="`error-${i}-date`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'date')?.[0] }}</p>
           </td>
           <td class="p-2 border">
-            <select v-model.number="row.employee_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'employee_id')">
+              <select v-model.number="row.employee_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'employee_id')" :aria-describedby="fieldError(i, 'employee_id') ? `error-${i}-employee` : undefined" :class="{'border-red-500': fieldError(i, 'employee_id')}">
               <option value="" disabled>Select employee</option>
               <option v-for="e in employees" :key="e.id" :value="e.id">{{ e.first_name }} {{ e.last_name }}</option>
             </select>
-            <p v-if="fieldError(i, 'employee_id')" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'employee_id')?.[0] }}</p>
+            <p v-if="fieldError(i, 'employee_id')" :id="`error-${i}-employee`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'employee_id')?.[0] }}</p>
           </td>
           <td class="p-2 border">
-            <select v-model.number="row.project_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'project_id')">
+              <select v-model.number="row.project_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'project_id')" :aria-describedby="fieldError(i, 'project_id') ? `error-${i}-project` : undefined" :class="{'border-red-500': fieldError(i, 'project_id')}">
               <option value="" disabled>Select project</option>
               <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
             </select>
-            <p v-if="fieldError(i, 'project_id')" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'project_id')?.[0] }}</p>
+            <p v-if="fieldError(i, 'project_id')" :id="`error-${i}-project`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'project_id')?.[0] }}</p>
           </td>
           <td class="p-2 border">
-            <select v-model.number="row.task_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'task_id')">
+              <select v-model.number="row.task_id" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'task_id')" :aria-describedby="fieldError(i, 'task_id') ? `error-${i}-task` : undefined" :class="{'border-red-500': fieldError(i, 'task_id')}">
               <option value="" disabled>Select task</option>
               <option v-for="t in tasks" :key="t.id" :value="t.id">{{ t.name }}</option>
             </select>
-            <p v-if="fieldError(i, 'task_id')" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'task_id')?.[0] }}</p>
+            <p v-if="fieldError(i, 'task_id')" :id="`error-${i}-task`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'task_id')?.[0] }}</p>
           </td>
           <td class="p-2 border">
-            <input type="number" step="0.25" min="0" v-model="row.hours" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'hours')" />
-            <p v-if="fieldError(i, 'hours')" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'hours')?.[0] }}</p>
+            <input type="number" step="0.25" min="0" v-model="row.hours" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" :aria-invalid="!!fieldError(i, 'hours')" :aria-describedby="fieldError(i, 'hours') ? `error-${i}-hours` : undefined" :class="{'border-red-500': fieldError(i, 'hours')}" />
+            <p v-if="fieldError(i, 'hours')" :id="`error-${i}-hours`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'hours')?.[0] }}</p>
           </td>
           <td class="p-2 border">
             <textarea v-model="row.description" class="w-full border rounded" rows="1" @keydown.tab.prevent="focusNext($event)"></textarea>
@@ -124,8 +124,19 @@ async function fetchOptions() {
 onMounted(fetchOptions);
 
 // rows for batch entry
-const rows = ref<Array<any>>([
-  { date: '', employee_id: null, project_id: null, task_id: null, hours: '', description: '' },
+// Define the shape of a row for better type safety. Using `null` for optional fields
+// aligns with Vue's `<input type="date">` which can emit `null` when cleared.
+interface TimeEntryRow {
+  date: string | null;
+  employee_id: number | null;
+  project_id: number | null;
+  task_id: number | null;
+  hours: string;
+  description: string;
+}
+
+const rows = ref<Array<TimeEntryRow>>([
+  { date: null, employee_id: null, project_id: null, task_id: null, hours: '', description: '' },
 ]);
 
 const loading = ref(false);
@@ -198,7 +209,7 @@ async function submitAll() {
     await axios.post('/api/time-entries/batch', { entries: rows.value });
     success.value = true;
     rows.value = [
-      { date: '', employee_id: null, project_id: null, task_id: null, hours: '', description: '' },
+      { date: null, employee_id: null, project_id: null, task_id: null, hours: '', description: '' },
     ];
   } catch (e: any) {
     const resp = e.response?.data;
