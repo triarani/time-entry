@@ -120,17 +120,12 @@ class TimeEntryController extends Controller
         }
 
         if (!empty($batchErrors)) {
-            // Transform errors to a flat array that includes the row index, field, and message.
+            // Transform errors to a keyed structure: "entries.{row}.{field}" => [messages]
             $formatted = [];
             foreach ($batchErrors as $row => $fields) {
                 foreach ($fields as $field => $messages) {
-                    foreach ($messages as $msg) {
-                        $formatted[] = [
-                            'row' => $row,
-                            'field' => $field,
-                            'message' => $msg,
-                        ];
-                    }
+                    $key = "entries.$row.$field";
+                    $formatted[$key] = $messages;
                 }
             }
             return response()->json(['errors' => $formatted], 422);
