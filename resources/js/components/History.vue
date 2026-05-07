@@ -344,8 +344,9 @@ async function remove(id: number) {
 
 function startEdit(entry: Entry) {
   editingId.value = entry.id;
+  const dateStr = entry.date ? entry.date.split('T')[0] : '';
   editForm.value = {
-    date: entry.date,
+    date: dateStr,
     employee_id: entry.employee?.id ?? null,
     project_id: entry.project?.id ?? null,
     task_id: entry.task?.id ?? null,
