@@ -287,6 +287,7 @@ const filteredEntries = computed(() => {
   if (search.value) {
     const q = search.value.toLowerCase();
     result = result.filter(e =>
+      (e.company?.name || e.project?.company?.name || '').toLowerCase().includes(q) ||
       (e.employee?.first_name + ' ' + e.employee?.last_name).toLowerCase().includes(q) ||
       e.project?.name?.toLowerCase().includes(q) ||
       e.task?.name?.toLowerCase().includes(q) ||
