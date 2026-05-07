@@ -146,8 +146,9 @@ onMounted(fetchOptions);
     loading.value = true;
     error.value = '';
     success.value = false;
+    console.log('Submitting:', JSON.stringify(form.value));
     try {
-      await axios.post('/api/time-entries/batch', { entries: rows.value });
+      await axios.post('/api/time-entries/batch', { entries: [form.value] });
       success.value = true;
       // reset to a single empty row
       rows.value = [

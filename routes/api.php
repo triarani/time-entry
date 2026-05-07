@@ -21,6 +21,11 @@ Route::post('/time-entries', [TimeEntryController::class, 'store']);
 Route::post('/time-entry', [TimeEntryController::class, 'store']);
 // Batch endpoint for creating multiple time entries with validation per entry.
 Route::post('/time-entries/batch', [TimeEntryController::class, 'storeBatch']);
+// Update and delete endpoints
+Route::put('/time-entries/{id}', [TimeEntryController::class, 'update']);
+Route::delete('/time-entries/{id}', [TimeEntryController::class, 'destroy']);
+// Summary totals endpoint
+Route::get('/time-entries/summary', [TimeEntryController::class, 'summary']);
 // Dependent dropdown endpoints (company -> employees, projects, tasks) via OptionsController
 Route::get('/options/employees', [OptionsController::class, 'employees']);
 Route::get('/options/projects', [OptionsController::class, 'projects']);

@@ -25,14 +25,21 @@ class TimeEntryController extends Controller
             });
         }
 
+        if ($request->filled('employee_id')) {
+            $query->where('employee_id', $request->input('employee_id'));
+        }
+
+        if ($request->filled('project_id')) {
+            $query->where('project_id', $request->input('project_id'));
+        }
+
         if ($request->filled('date')) {
             $query->where('date', $request->input('date'));
         }
 
-        // Use cursor based pagination for efficient large result sets
         // Default page size of 50 entries; client can pass `per_page` query param
         $perPage = $request->query('per_page', 50);
-        return response()->json($query->orderByDesc('date')->cursorPaginate($perPage));
+        return response()->json($query->orderByDesc('date')->paginate($perPage));
     }
 
     /**
@@ -136,5 +143,117 @@ class TimeEntryController extends Controller
 
         $created = \App\Models\TimeEntry::insert($validatedEntries);
         return response()->json(['created' => count($validatedEntries)], 201);
+    }
+
+    /**
+     * Update an existing time entry.
+     */
+    public function update(Request $request, int $id)
+    {
+        $entry = TimeEntry::findOrFail($id);
+
+        $validated = \Validator::make($request->all(), [
+            'employee_id' => 'required|exists:employees,id',
+            'project_id'  => [
+                'required',
+                'exists:projects,id',
+                new \App\Rules\ProjectPerDateRule(
+                    $request->input('employee_id'),
+                    $request->input('date') ?? $entry->date->toDateString(),
+                    $id
+                ),
+            ],
+            'task_id'     => 'required|exists:tasks,id',
+            'date'        => 'nullable|date',
+            'hours'       => 'required|numeric|min:0',
+            'notes'       => 'nullable|string',
+        ])->validate();
+
+        if (empty($validated['date'])) {
+            $validated['date'] = $entry->date->toDateString();
+        }
+
+        $entry->update($validated);
+        return response()->json($entry->fresh(['employee', 'project', 'task']));
+    }
+
+    /**
+     * Delete a time entry.
+     */
+    public function destroy(int $id)
+    {
+        $entry = TimeEntry::findOrFail($id);
+        $entry->delete();
+        return response()->json(['deleted' => true]);
+    }
+
+    /**
+     * Return summary totals by employee, project, or company.
+     */
+    public function summary(Request $request)
+    {
+        $by = $request->query('by', 'employee');
+        $query = TimeEntry::with(['employee', 'project']);
+
+        if ($request->filled('company_id')) {
+            $query->whereHas('project', function ($q) use ($request) {
+                $q->where('company_id', $request->input('company_id'));
+            });
+        }
+
+        if ($request->filled('employee_id')) {
+            $query->where('employee_id', $request->input('employee_id'));
+        }
+
+        if ($request->filled('project_id')) {
+            $query->where('project_id', $request->input('project_id'));
+        }
+
+        if ($request->filled('from')) {
+            $query->where('date', '>=', $request->input('from'));
+        }
+
+        if ($request->filled('to')) {
+            $query->where('date', '<=', $request->input('to'));
+        }
+
+        $entries = $query->get();
+
+        if ($by === 'company') {
+            $grouped = $entries->groupBy(fn($e) => $e->project->company_id ?? 'unknown');
+            $result = $grouped->map(function ($group, $companyId) {
+                $company = $group->first()->project->company ?? null;
+                return [
+                    'id' => $companyId,
+                    'name' => $company?->name ?? 'Unknown',
+                    'total_hours' => $group->sum('hours'),
+                ];
+            })->sortByDesc('total_hours')->values();
+        } elseif ($by === 'project') {
+            $grouped = $entries->groupBy('project_id');
+            $result = $grouped->map(function ($group, $projectId) {
+                return [
+                    'id' => $projectId,
+                    'name' => $group->first()->project->name ?? 'Unknown',
+                    'total_hours' => $group->sum('hours'),
+                ];
+            })->sortByDesc('total_hours')->values();
+        } else {
+            $grouped = $entries->groupBy('employee_id');
+            $result = $grouped->map(function ($group, $employeeId) {
+                return [
+                    'id' => $employeeId,
+                    'name' => $group->first()->employee ? 
+                        $group->first()->employee->first_name . ' ' . $group->first()->employee->last_name : 'Unknown',
+                    'total_hours' => $group->sum('hours'),
+                ];
+            })->sortByDesc('total_hours')->values();
+        }
+
+        return response()->json([
+            'summary_by' => $by,
+            'totals' => $result,
+            'grand_total' => $entries->sum('hours'),
+        ]);
     }
 }
