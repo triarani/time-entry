@@ -2,24 +2,24 @@
   <div class="w-full p-4 bg-white dark:bg-gray-800 rounded shadow">
     <h2 class="text-lg font-medium mb-4">History</h2>
 
-    <div class="mb-4 flex flex-wrap gap-2 items-center">
+    <div class="mb-4 flex flex-wrap gap-3 items-center">
       <input
         v-model="search"
         type="text"
-        placeholder="Search..."
-        class="px-3 py-2 border rounded text-sm"
+        placeholder="Search entries..."
+        class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 w-48"
       />
-      <select v-model="filterEmployee" class="px-3 py-2 border rounded text-sm">
+      <select v-model="filterEmployee" class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
         <option value="">All Employees</option>
         <option v-for="e in employees" :key="e.id" :value="e.id">
           {{ e.first_name }} {{ e.last_name }}
         </option>
       </select>
-      <select v-model="filterProject" class="px-3 py-2 border rounded text-sm">
+      <select v-model="filterProject" class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
         <option value="">All Projects</option>
         <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
       </select>
-      <button @click="showSummary = !showSummary" class="px-3 py-2 bg-gray-200 rounded text-sm hover:bg-gray-300">
+      <button @click="showSummary = !showSummary" class="px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg text-sm hover:from-gray-700 hover:to-gray-800 shadow-md transition-all duration-200">
         {{ showSummary ? 'Hide' : 'Show' }} Summary
       </button>
     </div>
@@ -65,25 +65,25 @@
     <div v-if="loading" class="text-sm text-gray-600">Loading...</div>
     <div v-else-if="error" class="text-sm text-red-600">{{ error }}</div>
     <div v-else>
-      <table class="min-w-full text-sm">
+      <table class="w-full text-sm">
         <thead>
-          <tr class="bg-gray-100 text-left">
-            <th class="p-2">Company</th>
-            <th @click="sortBy('date')" class="p-2 cursor-pointer hover:bg-gray-200">
+          <tr class="bg-gradient-to-r from-gray-800 to-gray-700 text-white">
+            <th class="p-3 border border-gray-600">Company</th>
+            <th @click="sortBy('date')" class="p-3 border border-gray-600 cursor-pointer hover:bg-gray-600 transition-colors">
               Date {{ sortIcon('date') }}
             </th>
-            <th @click="sortBy('employee')" class="p-2 cursor-pointer hover:bg-gray-200">
+            <th @click="sortBy('employee')" class="p-3 border border-gray-600 cursor-pointer hover:bg-gray-600 transition-colors">
               Employee {{ sortIcon('employee') }}
             </th>
-            <th @click="sortBy('project')" class="p-2 cursor-pointer hover:bg-gray-200">
+            <th @click="sortBy('project')" class="p-3 border border-gray-600 cursor-pointer hover:bg-gray-600 transition-colors">
               Project {{ sortIcon('project') }}
             </th>
-            <th class="p-2">Task</th>
-            <th @click="sortBy('hours')" class="p-2 cursor-pointer hover:bg-gray-200">
+            <th class="p-3 border border-gray-600">Task</th>
+            <th @click="sortBy('hours')" class="p-3 border border-gray-600 cursor-pointer hover:bg-gray-600 transition-colors">
               Hours {{ sortIcon('hours') }}
             </th>
-            <th class="p-2">Notes</th>
-            <th class="p-2">Actions</th>
+            <th class="p-3 border border-gray-600">Notes</th>
+            <th class="p-3 border border-gray-600">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -93,32 +93,32 @@
                 {{ entry.company?.name || entry.project?.company?.name || '-' }}
               </td>
               <td class="p-2">
-                <input type="date" v-model="editForm.date" class="w-full border rounded" />
+                <input type="date" v-model="editForm.date" class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
               </td>
               <td class="p-2">
-                <select v-model.number="editForm.employee_id" class="w-full border rounded">
+                <select v-model.number="editForm.employee_id" class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                   <option v-for="e in employees" :key="e.id" :value="e.id">{{ e.first_name }} {{ e.last_name }}</option>
                 </select>
               </td>
               <td class="p-2">
-                <select v-model.number="editForm.project_id" class="w-full border rounded">
+                <select v-model.number="editForm.project_id" class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                   <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
                 </select>
               </td>
               <td class="p-2">
-                <select v-model.number="editForm.task_id" class="w-full border rounded">
+                <select v-model.number="editForm.task_id" class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                   <option v-for="t in tasks" :key="t.id" :value="t.id">{{ t.name }}</option>
                 </select>
               </td>
               <td class="p-2">
-                <input type="number" step="0.25" min="0" v-model="editForm.hours" class="w-full border rounded" />
+                <input type="number" step="0.25" min="0" v-model="editForm.hours" class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
               </td>
               <td class="p-2">
-                <textarea v-model="editForm.notes" class="w-full border rounded" rows="1"></textarea>
+                <textarea v-model="editForm.notes" class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="1"></textarea>
               </td>
               <td class="p-2 space-x-1">
-                <button @click="saveEdit" class="px-2 py-1 bg-green-600 text-white rounded text-xs">Save</button>
-                <button @click="cancelEdit" class="px-2 py-1 bg-gray-400 text-white rounded text-xs">Cancel</button>
+                <button @click="saveEdit" class="px-3 py-1.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded text-xs font-medium hover:from-green-600 hover:to-green-700 shadow">Save</button>
+                <button @click="cancelEdit" class="px-3 py-1.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded text-xs font-medium hover:from-gray-600 hover:to-gray-700 shadow">Cancel</button>
               </td>
             </template>
             <template v-else>
@@ -130,8 +130,8 @@
               <td class="p-2">{{ entry.hours }}h</td>
               <td class="p-2">{{ entry.notes || '-' }}</td>
               <td class="p-2 space-x-1">
-                <button @click="startEdit(entry)" class="px-2 py-1 bg-blue-600 text-white rounded text-xs">Edit</button>
-                <button @click="remove(entry.id)" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Delete</button>
+                <button @click="startEdit(entry)" class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded text-xs font-medium hover:from-blue-600 hover:to-blue-700 shadow">Edit</button>
+                <button @click="remove(entry.id)" class="px-3 py-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded text-xs font-medium hover:from-red-600 hover:to-red-700 shadow">Delete</button>
               </td>
             </template>
           </tr>

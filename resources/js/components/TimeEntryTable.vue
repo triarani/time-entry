@@ -2,15 +2,15 @@
   <div class="w-full">
     <table class="w-full border-collapse">
       <thead>
-        <tr class="bg-gray-100">
-          <th class="p-2 border">Company</th>
-          <th class="p-2 border">Date</th>
-          <th class="p-2 border">Employee</th>
-          <th class="p-2 border">Project</th>
-          <th class="p-2 border">Task</th>
-          <th class="p-2 border">Hours</th>
-          <th class="p-2 border">Notes</th>
-          <th class="p-2 border">Actions</th>
+        <tr class="bg-gradient-to-r from-gray-800 to-gray-700 text-white">
+          <th class="p-3 border border-gray-600">Company</th>
+          <th class="p-3 border border-gray-600">Date</th>
+          <th class="p-3 border border-gray-600">Employee</th>
+          <th class="p-3 border border-gray-600">Project</th>
+          <th class="p-3 border border-gray-600">Task</th>
+          <th class="p-3 border border-gray-600">Hours</th>
+          <th class="p-3 border border-gray-600">Notes</th>
+          <th class="p-3 border border-gray-600">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -18,7 +18,7 @@
           <td class="p-2 border">
             <select
               v-model.number="row.company_id"
-              class="w-full border rounded"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
               @keydown.enter.prevent="addRow"
               @keydown.tab.prevent="focusNext($event)"
               @change="onCompanyChange(i)"
@@ -28,12 +28,12 @@
             </select>
           </td>
           <td class="p-2 border">
-            <input type="date" v-model="row.date" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" />
+            <input type="date" v-model="row.date" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" />
           </td>
           <td class="p-2 border">
             <select
               v-model.number="row.employee_id"
-              class="w-full border rounded"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
               @keydown.enter.prevent="addRow"
               @keydown.tab.prevent="focusNext($event)"
               :disabled="!row.company_id"
@@ -45,7 +45,7 @@
           <td class="p-2 border">
             <select
               v-model.number="row.project_id"
-              class="w-full border rounded"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
               @keydown.enter.prevent="addRow"
               @keydown.tab.prevent="focusNext($event)"
               :disabled="!row.company_id"
@@ -57,7 +57,7 @@
           <td class="p-2 border">
             <select
               v-model.number="row.task_id"
-              class="w-full border rounded"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
               @keydown.enter.prevent="addRow"
               @keydown.tab.prevent="focusNext($event)"
               :disabled="!row.company_id"
@@ -67,16 +67,16 @@
             </select>
           </td>
           <td class="p-2 border">
-            <input type="number" step="0.25" min="0" v-model="row.hours" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" />
+            <input type="number" step="0.25" min="0" v-model="row.hours" placeholder="0.00" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" />
           </td>
           <td class="p-2 border">
-            <textarea v-model="row.description" class="w-full border rounded" rows="1" @keydown.tab.prevent="focusNext($event)"></textarea>
+            <textarea v-model="row.description" placeholder="Notes..." class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" rows="1" @keydown.tab.prevent="focusNext($event)"></textarea>
           </td>
           <td class="p-2 border text-center space-x-1">
-            <button type="button" @click="duplicateRow(i)" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" title="Duplicate row">
+            <button type="button" @click="duplicateRow(i)" class="px-3 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 shadow-md transition-all duration-200" title="Duplicate row">
               ⧉
             </button>
-            <button v-if="i > 0" type="button" @click="deleteRow(i)" class="px-2 py-1 bg-red-200 rounded hover:bg-red-300" title="Delete row">
+            <button v-if="i > 0" type="button" @click="deleteRow(i)" class="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 shadow-md transition-all duration-200" title="Delete row">
               ✕
             </button>
           </td>
@@ -100,7 +100,7 @@
       <div v-else-if="savedCount > 0" class="text-sm text-green-600">
         Saved {{ savedCount }} {{ savedCount === 1 ? 'entry' : 'entries' }}!
       </div>
-      <button @click="submitAll" :disabled="loading" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+      <button @click="submitAll" :disabled="loading" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg shadow-lg hover:from-blue-700 hover:to-blue-800 hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
         {{ loading ? 'Saving...' : 'Save All' }}
       </button>
     </div>
