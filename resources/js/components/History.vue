@@ -19,7 +19,7 @@
         <option value="">All Projects</option>
         <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
       </select>
-      <button @click="showSummary = !showSummary" class="px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg text-sm hover:from-gray-700 hover:to-gray-800 shadow-md transition-all duration-200">
+      <button @click="showSummary = !showSummary" class="px-4 py-2 bg-linear-to-r from-gray-600 to-gray-700 text-white rounded-lg text-sm hover:from-gray-700 hover:to-gray-800 shadow-md transition-all duration-200">
         {{ showSummary ? 'Hide' : 'Show' }} Summary
       </button>
     </div>
@@ -67,7 +67,7 @@
     <div v-else>
       <table class="w-full text-sm">
         <thead>
-          <tr class="bg-gradient-to-r from-gray-800 to-gray-700 text-white">
+          <tr class="bg-linear-to-r from-gray-800 to-gray-700 text-white">
             <th class="p-3 border border-gray-600">Company</th>
             <th @click="sortBy('date')" class="p-3 border border-gray-600 cursor-pointer hover:bg-gray-600 transition-colors">
               Date {{ sortIcon('date') }}
@@ -117,8 +117,8 @@
                 <textarea v-model="editForm.notes" class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="1"></textarea>
               </td>
               <td class="p-2 space-x-1">
-                <button @click="saveEdit" class="px-3 py-1.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded text-xs font-medium hover:from-green-600 hover:to-green-700 shadow">Save</button>
-                <button @click="cancelEdit" class="px-3 py-1.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded text-xs font-medium hover:from-gray-600 hover:to-gray-700 shadow">Cancel</button>
+                <button @click="saveEdit" class="px-3 py-1.5 bg-linear-to-r from-green-500 to-green-600 text-white rounded text-xs font-medium hover:from-green-600 hover:to-green-700 shadow">Save</button>
+                <button @click="cancelEdit" class="px-3 py-1.5 bg-linear-to-r from-gray-500 to-gray-600 text-white rounded text-xs font-medium hover:from-gray-600 hover:to-gray-700 shadow">Cancel</button>
               </td>
             </template>
             <template v-else>
@@ -130,8 +130,8 @@
               <td class="p-2">{{ entry.hours }}h</td>
               <td class="p-2">{{ entry.notes || '-' }}</td>
               <td class="p-2 space-x-1">
-                <button @click="startEdit(entry)" class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded text-xs font-medium hover:from-blue-600 hover:to-blue-700 shadow">Edit</button>
-                <button @click="remove(entry.id)" class="px-3 py-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded text-xs font-medium hover:from-red-600 hover:to-red-700 shadow">Delete</button>
+                <button @click="startEdit(entry)" class="px-3 py-1.5 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded text-xs font-medium hover:from-blue-600 hover:to-blue-700 shadow">Edit</button>
+                <button @click="remove(entry.id)" class="px-3 py-1.5 bg-linear-to-r from-red-500 to-red-600 text-white rounded text-xs font-medium hover:from-red-600 hover:to-red-700 shadow">Delete</button>
               </td>
             </template>
           </tr>
