@@ -1,6 +1,6 @@
 <template>
-  <div class="overflow-x-auto">
-    <table class="min-w-full border-collapse">
+  <div class="w-full">
+    <table class="w-full border-collapse">
       <thead>
         <tr class="bg-gray-100">
           <th class="p-2 border">Company</th>
@@ -14,7 +14,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(row, i) in rows" :key="i" class="border-t" :class="{'bg-red-50': rowHasError(i)}">
+        <tr v-for="(row, i) in rows" :key="i" class="border-t">
           <td class="p-2 border">
             <select
               v-model.number="row.company_id"
@@ -22,18 +22,13 @@
               @keydown.enter.prevent="addRow"
               @keydown.tab.prevent="focusNext($event)"
               @change="onCompanyChange(i)"
-              :aria-invalid="!!fieldError(i, 'company_id')"
-              :aria-describedby="fieldError(i, 'company_id') ? `error-${i}-company` : undefined"
-              :class="{'border-red-500': fieldError(i, 'company_id')}"
             >
               <option :value="null" disabled>Select company</option>
               <option v-for="c in companies" :key="c.id" :value="c.id">{{ c.name }}</option>
             </select>
-            <p v-if="fieldError(i, 'company_id')" :id="`error-${i}-company`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'company_id')?.[0] }}</p>
           </td>
           <td class="p-2 border">
-            <input type="date" v-model="row.date" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" @input="clearError(i, 'date')" :aria-invalid="!!fieldError(i, 'date')" :aria-describedby="fieldError(i, 'date') ? `error-${i}-date` : undefined" :class="{'border-red-500': fieldError(i, 'date')}" />
-            <p v-if="fieldError(i, 'date')" :id="`error-${i}-date`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'date')?.[0] }}</p>
+            <input type="date" v-model="row.date" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" />
           </td>
           <td class="p-2 border">
             <select
@@ -41,16 +36,11 @@
               class="w-full border rounded"
               @keydown.enter.prevent="addRow"
               @keydown.tab.prevent="focusNext($event)"
-              @change="clearError(i, 'employee_id')"
-              :aria-invalid="!!fieldError(i, 'employee_id')"
-              :aria-describedby="fieldError(i, 'employee_id') ? `error-${i}-employee` : undefined"
-              :class="{'border-red-500': fieldError(i, 'employee_id')}"
               :disabled="!row.company_id"
             >
               <option :value="null" disabled>Select employee</option>
               <option v-for="e in getEmployeesForRow(i)" :key="e.id" :value="e.id">{{ e.first_name }} {{ e.last_name }}</option>
             </select>
-            <p v-if="fieldError(i, 'employee_id')" :id="`error-${i}-employee`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'employee_id')?.[0] }}</p>
           </td>
           <td class="p-2 border">
             <select
@@ -58,16 +48,11 @@
               class="w-full border rounded"
               @keydown.enter.prevent="addRow"
               @keydown.tab.prevent="focusNext($event)"
-              @change="clearError(i, 'project_id')"
-              :aria-invalid="!!fieldError(i, 'project_id')"
-              :aria-describedby="fieldError(i, 'project_id') ? `error-${i}-project` : undefined"
-              :class="{'border-red-500': fieldError(i, 'project_id')}"
               :disabled="!row.company_id"
             >
               <option :value="null" disabled>Select project</option>
               <option v-for="p in getProjectsForRow(i)" :key="p.id" :value="p.id">{{ p.name }}</option>
             </select>
-            <p v-if="fieldError(i, 'project_id')" :id="`error-${i}-project`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'project_id')?.[0] }}</p>
           </td>
           <td class="p-2 border">
             <select
@@ -75,37 +60,42 @@
               class="w-full border rounded"
               @keydown.enter.prevent="addRow"
               @keydown.tab.prevent="focusNext($event)"
-              @change="clearError(i, 'task_id')"
-              :aria-invalid="!!fieldError(i, 'task_id')"
-              :aria-describedby="fieldError(i, 'task_id') ? `error-${i}-task` : undefined"
-              :class="{'border-red-500': fieldError(i, 'task_id')}"
               :disabled="!row.company_id"
             >
               <option :value="null" disabled>Select task</option>
               <option v-for="t in getTasksForRow(i)" :key="t.id" :value="t.id">{{ t.name }}</option>
             </select>
-            <p v-if="fieldError(i, 'task_id')" :id="`error-${i}-task`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'task_id')?.[0] }}</p>
           </td>
           <td class="p-2 border">
-            <input type="number" step="0.25" min="0" v-model="row.hours" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" @input="clearError(i, 'hours')" :aria-invalid="!!fieldError(i, 'hours')" :aria-describedby="fieldError(i, 'hours') ? `error-${i}-hours` : undefined" :class="{'border-red-500': fieldError(i, 'hours')}" />
-            <p v-if="fieldError(i, 'hours')" :id="`error-${i}-hours`" class="text-sm text-red-600" role="alert">{{ fieldError(i, 'hours')?.[0] }}</p>
+            <input type="number" step="0.25" min="0" v-model="row.hours" class="w-full border rounded" @keydown.enter.prevent="addRow" @keydown.tab.prevent="focusNext($event)" />
           </td>
           <td class="p-2 border">
             <textarea v-model="row.description" class="w-full border rounded" rows="1" @keydown.tab.prevent="focusNext($event)"></textarea>
           </td>
-          <td class="p-2 border text-center">
-            <div v-if="savingIndex === i" class="text-xs text-blue-600">Saving...</div>
-            <div v-else-if="savedRows.has(i)" class="text-xs text-green-600">✓</div>
-            <button v-else type="button" @click="duplicateRow(i)" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" title="Duplicate row">
+          <td class="p-2 border text-center space-x-1">
+            <button type="button" @click="duplicateRow(i)" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" title="Duplicate row">
               ⧉
+            </button>
+            <button v-if="i > 0" type="button" @click="deleteRow(i)" class="px-2 py-1 bg-red-200 rounded hover:bg-red-300" title="Delete row">
+              ✕
             </button>
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="mt-4 flex justify-between items-center">
+    <div v-if="errorCount > 0" class="mt-4 p-3 bg-red-50 border border-red-200 rounded">
+      <div class="font-medium text-red-700 mb-2">Errors ({{ Object.keys(errors).length }}):</div>
+      <ul class="text-sm text-red-600 space-y-1">
+        <li v-for="(msgs, key) in errors" :key="key">
+          <span v-if="key.includes('._')" class="font-medium">Row {{ parseInt(key.split('.')[1]) + 1 }}:</span>
+          <span v-else class="font-medium">Row {{ parseInt(key.split('.')[1]) + 1 }} - {{ key.split('.')[2] }}:</span>
+          {{ msgs[0] }}
+        </li>
+      </ul>
+    </div>
+    <div class="mt-4 flex items-center justify-end gap-4">
       <div v-if="loading" class="text-sm text-gray-600">
-        Saving row {{ savingIndex + 1 }} of {{ rows.length }}...
+        Saving...
       </div>
       <div v-else-if="savedCount > 0" class="text-sm text-green-600">
         Saved {{ savedCount }} {{ savedCount === 1 ? 'entry' : 'entries' }}!
@@ -114,13 +104,13 @@
         {{ loading ? 'Saving...' : 'Save All' }}
       </button>
     </div>
-    <p v-if="globalError" class="mt-2 text-red-600" role="alert">{{ globalError }}</p>
-    <p v-if="success" class="mt-2 text-green-600">Saved!</p>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+
+const errorCount = computed(() => Object.keys(errors.value).length);
 import axios from 'axios';
 
 const props = defineProps<{
@@ -275,6 +265,10 @@ function duplicateRow(index: number) {
     hours: '',
     description: '',
   });
+}
+
+function deleteRow(index: number) {
+  rows.value.splice(index, 1);
 }
 
 function focusNext(event: KeyboardEvent) {

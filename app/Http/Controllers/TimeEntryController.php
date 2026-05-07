@@ -53,7 +53,7 @@ class TimeEntryController extends Controller
      */
     public function store(Request $request)
     {
-        // Basic field validation with custom rule
+        $date = $request->input('date') ?? now()->toDateString();
         $validated = \Validator::make($request->all(), [
             'employee_id' => 'required|exists:employees,id',
             'project_id'  => [
@@ -61,11 +61,19 @@ class TimeEntryController extends Controller
                 'exists:projects,id',
                 new \App\Rules\ProjectPerDateRule(
                     $request->input('employee_id'),
-                    $request->input('date') ?? now()->toDateString()
+                    $date
                 ),
             ],
-            // Tasks are company‑wide, not project‑specific.
-            'task_id'     => 'required|exists:tasks,id',
+            'task_id'     => [
+                'required',
+                'exists:tasks,id',
+                new \App\Rules\NoDuplicateTimeEntryRule(
+                    $request->input('employee_id'),
+                    $request->input('project_id'),
+                    $request->input('task_id'),
+                    $date
+                ),
+            ],
             'date'        => 'nullable|date',
             'hours'       => 'required|numeric|min:0',
             'notes'       => 'nullable|string',
@@ -109,6 +117,7 @@ class TimeEntryController extends Controller
         $validatedEntries = [];
 
         foreach ($entries as $index => $entry) {
+            $date = $entry['date'] ?? now()->toDateString();
             $validator = \Validator::make($entry, [
                 'employee_id' => 'required|exists:employees,id',
                 'project_id'  => [
@@ -116,10 +125,19 @@ class TimeEntryController extends Controller
                     'exists:projects,id',
                     new \App\Rules\ProjectPerDateRule(
                         $entry['employee_id'],
-                        $entry['date'] ?? now()->toDateString()
+                        $date
                     ),
                 ],
-                'task_id'     => 'required|exists:tasks,id',
+                'task_id'     => [
+                    'required',
+                    'exists:tasks,id',
+                    new \App\Rules\NoDuplicateTimeEntryRule(
+                        $entry['employee_id'],
+                        $entry['project_id'],
+                        $entry['task_id'],
+                        $date
+                    ),
+                ],
                 'date'        => 'nullable|date',
                 'hours'       => 'required|numeric|min:0',
                 'notes'       => 'nullable|string',
@@ -171,6 +189,7 @@ class TimeEntryController extends Controller
     {
         $entry = TimeEntry::findOrFail($id);
 
+        $date = $request->input('date') ?? $entry->date->toDateString();
         $validated = \Validator::make($request->all(), [
             'employee_id' => 'required|exists:employees,id',
             'project_id'  => [
@@ -178,11 +197,21 @@ class TimeEntryController extends Controller
                 'exists:projects,id',
                 new \App\Rules\ProjectPerDateRule(
                     $request->input('employee_id'),
-                    $request->input('date') ?? $entry->date->toDateString(),
+                    $date,
                     $id
                 ),
             ],
-            'task_id'     => 'required|exists:tasks,id',
+            'task_id'     => [
+                'required',
+                'exists:tasks,id',
+                new \App\Rules\NoDuplicateTimeEntryRule(
+                    $request->input('employee_id'),
+                    $request->input('project_id'),
+                    $request->input('task_id'),
+                    $date,
+                    $id
+                ),
+            ],
             'date'        => 'nullable|date',
             'hours'       => 'required|numeric|min:0',
             'notes'       => 'nullable|string',

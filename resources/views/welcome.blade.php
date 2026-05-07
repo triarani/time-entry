@@ -14,6 +14,6 @@
     </head>
     <body class="bg-gray-100 dark:bg-gray-900 flex items-center justify-center min-h-screen p-4">
         <!-- Centered app container with max width 980px -->
-        <div id="app" class="w-full max-w-245 mx-auto"></div>
+        <div id="app" class="w-full"></div>
     </body>
 </html>

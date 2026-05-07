@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col space-y-4 p-4 max-w-7xl mx-auto">
+  <div class="flex flex-col space-y-4 p-4 w-full">
     <div class="flex items-center gap-4 bg-white dark:bg-gray-800 p-4 rounded shadow">
       <label class="font-medium text-gray-700 dark:text-gray-300">Company:</label>
       <select
