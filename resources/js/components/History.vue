@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-187.5 mx-auto p-4 bg-white dark:bg-gray-800 rounded shadow">
+  <div class="max-w-245 mx-auto p-4 bg-white dark:bg-gray-800 rounded shadow">
     <h2 class="text-lg font-medium mb-4">History</h2>
 
     <div class="mb-4 flex flex-wrap gap-2 items-center">
@@ -192,7 +192,8 @@ interface Entry {
   hours: number;
   notes: string | null;
   employee?: { id: number; first_name: string; last_name: string };
-  project?: { id: number; name: string; company_id?: number };
+  project?: { id: number; name: string; company?: { id: number; name: string } };
+  company?: { id: number; name: string };
   task?: { id: number; name: string };
 }
 

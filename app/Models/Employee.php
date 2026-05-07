@@ -18,7 +18,7 @@ class Employee extends Model
 
     public function companies()
     {
-        return $this->belongsToMany(Company::class, 'employee_company');
+        return $this->belongsToMany(Company::class, 'company_employee');
     }
 
     public function projects()
