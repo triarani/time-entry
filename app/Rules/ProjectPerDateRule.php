@@ -27,15 +27,15 @@ class ProjectPerDateRule implements ValidationRule
         }
 
         $query = TimeEntry::where('employee_id', $this->employeeId)
-            ->where('project_id', $value)
-            ->where('date', $this->date);
+            ->where('date', $this->date)
+            ->where('project_id', '!=', $value);
 
         if ($this->excludeId) {
             $query->where('id', '!=', $this->excludeId);
         }
 
         if ($query->exists()) {
-            $fail('This employee already has an entry for this project on this date.');
+            $fail('This employee already has an entry for a different project on this date. Employees can only work on one project per date, but can work on multiple tasks for that project.');
         }
     }
 }

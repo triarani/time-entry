@@ -17,7 +17,7 @@ class TimeEntryController extends Controller
      */
     public function index(Request $request)
     {
-        $query = TimeEntry::with(['employee', 'project', 'task']);
+        $query = TimeEntry::with(['employee', 'project', 'task', 'company']);
 
         if ($request->filled('company_id')) {
             $query->whereHas('project', function ($q) use ($request) {
@@ -75,6 +75,13 @@ class TimeEntryController extends Controller
         if (empty($validated['date'])) {
             $validated['date'] = now()->toDateString();
         }
+        $project = Project::find($validated['project_id']);
+        $employee = Employee::find($validated['employee_id']);
+        $employeeCompanies = $employee->companies()->pluck('companies.id')->toArray();
+        if (!in_array($project->company_id, $employeeCompanies)) {
+            return response()->json(['message' => 'The selected employee does not belong to the selected project\'s company.'], 422);
+        }
+        $validated['company_id'] = $project?->company_id;
 
         $timeEntry = TimeEntry::create($validated);
         return response()->json($timeEntry, 201);
@@ -125,7 +132,15 @@ class TimeEntryController extends Controller
                 if (empty($data['date'])) {
                     $data['date'] = now()->toDateString();
                 }
-                $validatedEntries[] = $data;
+                $project = \App\Models\Project::find($data['project_id']);
+                $employee = \App\Models\Employee::find($data['employee_id']);
+                $employeeCompanies = $employee->companies()->pluck('companies.id')->toArray();
+                if (!in_array($project->company_id, $employeeCompanies)) {
+                    $batchErrors[$index] = ['employee_id' => ['The selected employee does not belong to the selected project\'s company.']];
+                } else {
+                    $data['company_id'] = $project?->company_id;
+                    $validatedEntries[] = $data;
+                }
             }
         }
 
@@ -141,6 +156,10 @@ class TimeEntryController extends Controller
             return response()->json(['errors' => $formatted], 422);
         }
 
+        foreach ($validatedEntries as &$entry) {
+            $entry['created_at'] = now();
+            $entry['updated_at'] = now();
+        }
         $created = \App\Models\TimeEntry::insert($validatedEntries);
         return response()->json(['created' => count($validatedEntries)], 201);
     }
@@ -172,6 +191,8 @@ class TimeEntryController extends Controller
         if (empty($validated['date'])) {
             $validated['date'] = $entry->date->toDateString();
         }
+        $project = Project::find($validated['project_id']);
+        $validated['company_id'] = $project?->company_id;
 
         $entry->update($validated);
         return response()->json($entry->fresh(['employee', 'project', 'task']));

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\Employee;
 use App\Models\Project;
 use App\Models\Task;
@@ -17,18 +18,30 @@ use Illuminate\Routing\Controller;
 class OptionsController extends Controller
 {
     /**
-     * Return employee options, cached for performance.
+     * Return company options, cached for performance.
+     */
+    public function companies()
+    {
+        $companies = Cache::remember('options:companies:all', now()->addMinutes(60), function () {
+            return Company::all();
+        });
+        return response()->json($companies);
+    }
+
+    /**
+     * Return employee options, filtered by company.
      * Cache key includes the optional company_id filter.
      */
     public function employees(Request $request)
     {
         $companyId = $request->query('company_id');
         $cacheKey = $companyId ? "options:employees:company:$companyId" : 'options:employees:all';
-        // Cache for 60 minutes (adjust as needed)
         $employees = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($companyId) {
             $query = Employee::query();
             if ($companyId) {
-                $query->where('company_id', $companyId);
+                $query->whereHas('companies', function ($q) use ($companyId) {
+                    $q->where('companies.id', $companyId);
+                });
             }
             return $query->get();
         });

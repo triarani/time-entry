@@ -68,6 +68,7 @@
       <table class="min-w-full text-sm">
         <thead>
           <tr class="bg-gray-100 text-left">
+            <th class="p-2">Company</th>
             <th @click="sortBy('date')" class="p-2 cursor-pointer hover:bg-gray-200">
               Date {{ sortIcon('date') }}
             </th>
@@ -88,6 +89,9 @@
         <tbody>
           <tr v-for="entry in filteredEntries" :key="entry.id" class="border-t" :class="{'bg-red-50': editingId === entry.id}">
             <template v-if="editingId === entry.id">
+              <td class="p-2">
+                {{ entry.company?.name || entry.project?.company?.name || '-' }}
+              </td>
               <td class="p-2">
                 <input type="date" v-model="editForm.date" class="w-full border rounded" />
               </td>
@@ -118,6 +122,7 @@
               </td>
             </template>
             <template v-else>
+              <td class="p-2">{{ entry.company?.name || entry.project?.company?.name || '-' }}</td>
               <td class="p-2">{{ entry.date }}</td>
               <td class="p-2">{{ entry.employee?.first_name }} {{ entry.employee?.last_name }}</td>
               <td class="p-2">{{ entry.project?.name }}</td>
@@ -168,6 +173,19 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 
+const props = defineProps<{
+  companyId: number | null;
+}>();
+
+const emit = defineEmits<{
+  (e: 'refresh'): void;
+}>();
+
+function onRefresh() {
+  fetchEntries();
+  emit('refresh');
+}
+
 interface Entry {
   id: number;
   date: string;
@@ -212,10 +230,12 @@ const editForm = ref({
 });
 
 async function fetchOptions() {
+  const companyId = props.companyId;
+  const params = companyId ? { company_id: companyId } : {};
   const [eRes, pRes, tRes] = await Promise.all([
-    axios.get('/api/options/employees'),
-    axios.get('/api/options/projects'),
-    axios.get('/api/options/tasks'),
+    axios.get('/api/options/employees', { params }),
+    axios.get('/api/options/projects', { params }),
+    axios.get('/api/options/tasks', { params }),
   ]);
   employees.value = eRes.data;
   projects.value = pRes.data;
@@ -227,6 +247,7 @@ async function fetchEntries() {
   error.value = '';
   try {
     const params: any = { per_page: perPage, page: page.value };
+    if (props.companyId) params.company_id = props.companyId;
     if (filterEmployee.value) params.employee_id = filterEmployee.value;
     if (filterProject.value) params.project_id = filterProject.value;
     const { data } = await axios.get('/api/time-entries', { params });
@@ -246,6 +267,7 @@ async function fetchSummary() {
     const { data } = await axios.get('/api/time-entries/summary', {
       params: {
         by: summaryBy.value,
+        company_id: props.companyId || undefined,
         employee_id: filterEmployee.value || undefined,
         project_id: filterProject.value || undefined,
       },
@@ -357,6 +379,14 @@ async function saveEdit() {
 
 watch([filterEmployee, filterProject], () => {
   page.value = 1;
+  fetchEntries();
+});
+
+watch(() => props.companyId, () => {
+  page.value = 1;
+  filterEmployee.value = '';
+  filterProject.value = '';
+  fetchOptions();
   fetchEntries();
 });
 

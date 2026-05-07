@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Company;
 
 class TimeEntry extends Model
 {
@@ -13,6 +14,7 @@ class TimeEntry extends Model
         'employee_id',
         'project_id',
         'task_id',
+        'company_id',
         'date',
         'hours',
         'notes',
@@ -26,4 +28,5 @@ class TimeEntry extends Model
     public function employee() { return $this->belongsTo(Employee::class); }
     public function project() { return $this->belongsTo(Project::class); }
     public function task() { return $this->belongsTo(Task::class); }
+    public function company() { return $this->belongsTo(Company::class); }
 }
