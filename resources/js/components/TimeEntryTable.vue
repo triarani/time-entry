@@ -3,14 +3,14 @@
     <table class="w-full border-collapse">
       <thead>
         <tr class="bg-gradient-to-r from-gray-800 to-gray-700 text-white">
-          <th class="p-3 border border-gray-600">Company</th>
-          <th class="p-3 border border-gray-600">Date</th>
-          <th class="p-3 border border-gray-600">Employee</th>
-          <th class="p-3 border border-gray-600">Project</th>
-          <th class="p-3 border border-gray-600">Task</th>
-          <th class="p-3 border border-gray-600">Hours</th>
+          <th class="p-3 border border-gray-600 w-40">Company</th>
+          <th class="p-3 border border-gray-600 w-32">Date</th>
+          <th class="p-3 border border-gray-600 w-40">Employee</th>
+          <th class="p-3 border border-gray-600 w-40">Project</th>
+          <th class="p-3 border border-gray-600 w-36">Task</th>
+          <th class="p-3 border border-gray-600 w-24">Hours</th>
           <th class="p-3 border border-gray-600">Notes</th>
-          <th class="p-3 border border-gray-600">Actions</th>
+          <th class="p-3 border border-gray-600 w-24">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -72,13 +72,15 @@
           <td class="p-2 border">
             <textarea v-model="row.description" placeholder="Notes..." class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" rows="1" @keydown.tab.prevent="focusNext($event)"></textarea>
           </td>
-          <td class="p-2 border text-center space-x-1">
-            <button type="button" @click="duplicateRow(i)" class="px-3 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 shadow-md transition-all duration-200" title="Duplicate row">
-              ⧉
-            </button>
-            <button v-if="i > 0" type="button" @click="deleteRow(i)" class="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 shadow-md transition-all duration-200" title="Delete row">
-              ✕
-            </button>
+          <td class="p-2 border">
+            <div class="flex items-center justify-center gap-2">
+              <button type="button" @click="duplicateRow(i)" class="px-3 py-1.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg hover:from-gray-600 hover:to-gray-700 shadow-md transition-all duration-200 text-sm" title="Duplicate row">
+                ⧉
+              </button>
+              <button v-if="i > 0" type="button" @click="deleteRow(i)" class="px-3 py-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 shadow-md transition-all duration-200 text-sm" title="Delete row">
+                ✕
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
